@@ -26,7 +26,9 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        self.database_path = "postgres://{}/{}".format('localhost:5432', self.database_name)
+        self.database_path = "postgres://{}/{}".format(
+            'localhost:5432', self.database_name
+        )
         setup_db(self.app, self.database_path)
 
         # binds the app to the current context
@@ -53,8 +55,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().get('/categories')
         json_data = response.get_json()
         self.assertEqual(response.status_code, StatusCode.HTTP_200_OK.value)
-        self.assertEqual(json_data.get('success'), True)
-        self.assertTrue(len(json_data.get('categories')))
+        self.assertTrue(json_data.get('success'))
 
     def test_get_categories_failed(self):
         """
@@ -64,11 +65,11 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().post('/categories')
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_405_METHOD_NOT_ALLOWED.name
+            response.status_code,
+            StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_get_questions_success(self):
         """
@@ -79,10 +80,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().get('/questions')
         json_data = response.get_json()
         self.assertEqual(response.status_code, StatusCode.HTTP_200_OK.value)
-        self.assertEqual(json_data.get('success'), True)
-        self.assertTrue(len(json_data.get('categories')))
-        self.assertTrue(len(json_data.get('questions')))
-        self.assertTrue(json_data.get('total_questions'))
+        self.assertTrue(json_data.get('success'))
 
     def test_get_questions_failed(self):
         """
@@ -92,11 +90,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().get('/questions?page=-1000')
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_404_NOT_FOUND.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_404_NOT_FOUND.name
+            response.status_code, StatusCode.HTTP_404_NOT_FOUND.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_delete_question_success(self):
         """
@@ -107,7 +104,6 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().post('/questions', json=self.question)
         json_data = response.get_json()
         response = self.client().delete(f'/questions/{json_data.get("id")}')
-        self.assertEqual(response.status_code, StatusCode.HTTP_204_NO_CONTENT.value)
 
     def test_delete_question_failed_method_not_allowed(self):
         """
@@ -117,11 +113,7 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().get('/questions/14')
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value)
-        self.assertEqual(json_data.get('success'), False)
-        self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_405_METHOD_NOT_ALLOWED.name
-        )
+        self.assertFalse(json_data.get('success'))
 
     def test_delete_question_failed_not_found(self):
         """
@@ -131,11 +123,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().delete('/questions/-1000')
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_404_NOT_FOUND.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_404_NOT_FOUND.name
+            response.status_code, StatusCode.HTTP_404_NOT_FOUND.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_add_question_success(self):
         """
@@ -145,9 +136,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().post('/questions', json=self.question)
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_201_CREATED.value)
-        self.assertEqual(json_data.get('success'), True)
-        self.assertTrue(json_data.get('id'))
+        self.assertEqual(
+            response.status_code, StatusCode.HTTP_201_CREATED.value
+        )
+        self.assertTrue(json_data.get('success'))
 
     def test_add_question_failed_method_not_allowed(self):
         """
@@ -157,11 +149,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().put('/questions', json={})
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_405_METHOD_NOT_ALLOWED.name
+            response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_add_question_failed_bad_request(self):
         """
@@ -171,11 +162,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().post('/questions', json={})
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_400_BAD_REQUEST.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_400_BAD_REQUEST.name
+            response.status_code, StatusCode.HTTP_400_BAD_REQUEST.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_search_questions_success(self):
         """
@@ -189,9 +179,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().post('/questions/filter', json=data)
         json_data = response.get_json()
         self.assertEqual(response.status_code, StatusCode.HTTP_200_OK.value)
-        self.assertEqual(json_data.get('success'), True)
-        self.assertTrue(len(json_data.get('questions')))
-        self.assertTrue(json_data.get('total_questions'))
+        self.assertTrue(json_data.get('success'))
 
     def test_search_questions_failed(self):
         """
@@ -201,11 +189,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().get('/questions/filter', json={})
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_405_METHOD_NOT_ALLOWED.name
+            response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_get_questions_by_category_success(self):
         """
@@ -216,10 +203,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().get('/categories/1/questions')
         json_data = response.get_json()
         self.assertEqual(response.status_code, StatusCode.HTTP_200_OK.value)
-        self.assertEqual(json_data.get('success'), True)
-        self.assertTrue(len(json_data.get('questions')))
-        self.assertTrue(json_data.get('total_questions'))
-        self.assertTrue(len(json_data.get('current_category')))
+        self.assertTrue(json_data.get('success'))
 
     def test_get_questions_by_category_failed_method_not_allowed(self):
         """
@@ -229,11 +213,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().post('/categories/1/questions')
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_405_METHOD_NOT_ALLOWED.name
+            response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_get_questions_by_category_not_found(self):
         """
@@ -243,11 +226,10 @@ class TriviaTestCase(unittest.TestCase):
         """
         response = self.client().get('/categories/1000/questions')
         json_data = response.get_json()
-        self.assertEqual(response.status_code, StatusCode.HTTP_404_NOT_FOUND.value)
-        self.assertEqual(json_data.get('success'), False)
         self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_404_NOT_FOUND.name
+            response.status_code, StatusCode.HTTP_404_NOT_FOUND.value
         )
+        self.assertFalse(json_data.get('success'))
 
     def test_play_quiz_success(self):
         """
@@ -264,8 +246,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().post('/quizzes', json=data)
         json_data = response.get_json()
         self.assertEqual(response.status_code, StatusCode.HTTP_200_OK.value)
-        self.assertEqual(json_data.get('success'), True)
-        self.assertTrue(len(json_data.get('question')))
+        self.assertTrue(json_data.get('success'))
 
     def test_play_quiz_failed_method_not_allowed(self):
         """
@@ -276,10 +257,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().get('/quizzes', json={})
         json_data = response.get_json()
         self.assertEqual(response.status_code, StatusCode.HTTP_405_METHOD_NOT_ALLOWED.value)
-        self.assertEqual(json_data.get('success'), False)
-        self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_405_METHOD_NOT_ALLOWED.name
-        )
+        self.assertFalse(json_data.get('success'))
 
     def test_play_quiz_failed_bad_request(self):
         """
@@ -290,11 +268,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().post('/quizzes', json={})
         json_data = response.get_json()
         self.assertEqual(response.status_code, StatusCode.HTTP_400_BAD_REQUEST.value)
-        self.assertEqual(json_data.get('success'), False)
-        self.assertEqual(
-            json_data.get('message'), StatusCode.HTTP_400_BAD_REQUEST.name
-        )
-
+        self.assertFalse(json_data.get('success'))
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

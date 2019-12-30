@@ -358,7 +358,7 @@ Bad Request `400`
 {
   'success': false,
   'error': 400,
-  'message': 'Bad Request'
+  'message': 'HTTP_400_BAD_REQUEST'
 }
 ```
 
@@ -368,7 +368,7 @@ Unauthorized `401`
 {
   'success': false,
   'error': 401,
-  'message': 'Unauthorized'
+  'message': 'HTTP_401_UNAUTHORIZED'
 }
 ```
 
@@ -378,7 +378,7 @@ Forbidden `403`
 {
   'success': false,
   'error': 403,
-  'message': 'Forbidden'
+  'message': 'HTTP_403_FORBIDDEN'
 }
 ```
 
@@ -388,7 +388,7 @@ Not Found `404`
 {
   'success': false,
   'error': 404,
-  'message': 'Not Found'
+  'message': 'HTTP_404_NOT_FOUND'
 }
 ```
 
@@ -398,7 +398,7 @@ Method Not Allowed `405`
 {
   'success': false,
   'error': 405,
-  'message': 'Method Not Allowed'
+  'message': 'HTTP_405_METHOD_NOT_ALLOWED'
 }
 ```
 
@@ -408,7 +408,7 @@ Unprocessable Entity `422`
 {
   'success': false,
   'error': 422,
-  'message': 'Unprocessable Entity'
+  'message': 'HTTP_422_UNPROCESSABLE_ENTITY'
 }
 ```
 
@@ -418,7 +418,7 @@ Internal Server Error `500`
 {
   'success': false,
   'error': 500,
-  'message': 'Internal Server Error'
+  'message': 'HTTP_500_INTERNAL_SERVER_ERROR'
 }
 ```
 
